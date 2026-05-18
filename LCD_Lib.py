@@ -151,8 +151,8 @@ class LCD_1inch3(framebuf.FrameBuffer):
         self.spi.write(self.buffer)
         self.cs(1)
 
+LCD = LCD_1inch3()
 
-def setup():
-    pwm = PWM(Pin(BL))
-    pwm.freq(1000)
-    pwm.duty_u16(32768)
+pwm = PWM(Pin(BL))
+pwm.freq(1000)
+pwm.duty_u16(32768)

@@ -2,13 +2,14 @@ from LCD_Lib import LCD
 import time
 from keys import keyA, keyB, keyY#, keyX
 
-seconds_passed = 0
+ms_passed = 0
 
-def displaytime(seconds_passed):
-    hours = seconds_passed // 3600
-    minutes = (seconds_passed % 3600) // 60
-    seconds = seconds_passed % 60 
-    stopwatch = "%02d" % int(hours) + ":" + "%02d" % int(minutes) + ":" + "%02d" % int(seconds)
+def displaytime(ms_passed):
+    hours = ms_passed // 3600000
+    minutes = (ms_passed % 3600000) // 60000
+    seconds = (ms_passed % 60000) // 1000
+    ms = ms_passed % 1000
+    stopwatch = "%02d" % int(hours) + ":" + "%02d" % int(minutes) + ":" + "%02d" % int(seconds) + "." + "%03d" % int(ms)
     LCD.fill(0x0000)
     LCD.text("Stopwatch", 60, 40, LCD.green)
     LCD.text(stopwatch, 80, 120, LCD.white)
@@ -17,7 +18,7 @@ def displaytime(seconds_passed):
 def load_in():
     LCD.fill(0x0000)
     LCD.text("Stopwatch", 60, 40, LCD.green)
-    displaytime(seconds_passed)
+    displaytime(0)
     LCD.show()
 
 def startstopwatch():
@@ -26,14 +27,14 @@ def startstopwatch():
     start = time.ticks_ms()
     while True:
         if running == True:
-            seconds_passed = (time.ticks_diff(time.ticks_ms(), start) // 1000) + offset
-        displaytime(seconds_passed)
+            ms_passed = (time.ticks_diff(time.ticks_ms(), start)) + offset
+        displaytime(ms_passed)
         
         if keyY.value() == 0:
             return
         if keyA.value() == 0:
             if running == True:
-                offset = seconds_passed
+                offset = ms_passed
                 running = False
             else:
                 running = True
@@ -41,8 +42,8 @@ def startstopwatch():
                 
             while keyA.value() == 0:
                 pass
-            time.sleep(0.01)
-        time.sleep(0.01)
+            time.sleep(0.001)
+        time.sleep(0.001)
     
 def run():
     load_in()
@@ -50,7 +51,7 @@ def run():
     while True:
         if keyA.value() == 0:
             startstopwatch()
-            displaytime(seconds_passed)
+            displaytime(0)
             while keyA.value() == 0:
                 pass
             time.sleep(0.05)

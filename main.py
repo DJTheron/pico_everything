@@ -9,6 +9,8 @@ sys.path.append('apps')
 
 def displaycard(title):
     LCD.fill(0x0000)
+    if title.endswith('.py'):
+        title = title.replace('.py', '')
     LCD.text(title, 60, 115, LCD.green)
     LCD.show()
 
@@ -51,4 +53,3 @@ def main():
  
 if __name__=='__main__':
     main()
- 

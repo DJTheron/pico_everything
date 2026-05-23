@@ -1,26 +1,28 @@
 from LCD_Lib import LCD
 import framebuf
+import random
 import time
 from keys import up, keyA, keyY
+
+PIPE_WIDTH = 22
+GAP_SIZE = 65
 
 def load_in():
     LCD.fill(LCD.blue)
     LCD.show()
 
 def makepipe():
-           # ycorner, xcorner, startingy, startingx
-    return [20, 20, 60, 60]
-    
+    # [x, gap_y] — gap_y is the top of the opening
+    return [240, random.randint(40, 150)]
 
-def movepipe(pipe):
-    pipe[3] += 5
-    return pipe
+def movepipe(pipe, speed):
+    pipe[0] -= speed
 
 def run():
     
     bird_v = 0
     bird_y = 120
-    GRAVITY = 10
+    GRAVITY = 0.5
     load_in()
     pipes = []
     PIPESPEED = 5
@@ -34,29 +36,34 @@ def run():
         frame_start = time.ticks_ms()
         # Input
         if keyA.value() == 0 or up.value() == 0:
-            bird_v = -20
+            bird_v = -8
 
             # Debounce
             while keyA.value() == 0 or up.value() == 0:
                 pass
             time.sleep(0.001)
 
-            if keyY.value() == 0:
-                return
+        if keyY.value() == 0:
+            return
             
         # Fysics    
         bird_y += bird_v + GRAVITY
-        bird_v -= 1
+        bird_v += 1
 
         if pipes == []:
             pipes.append(makepipe())
             pipecounter = 20
+
+        pipecounter -= 1
         
         if pipecounter < 1:
             pipes.append(makepipe())
+            pipecounter = 40
         
         for pipe in pipes:
-            movepipe(pipe)
+            movepipe(pipe, PIPESPEED)
+        pipes = [p for p in pipes if p[0] > -PIPE_WIDTH]
+
 
         # Drawing
         LCD.fill(LCD.blue)
@@ -65,7 +72,8 @@ def run():
         LCD.blit(bird_fb, 60, int(bird_y), 0xF81F)
 
         for pipe in pipes:
-            LCD.fill_rect(pipe[0], pipe[1], pipe[2], pipe[3], LCD.green)
+            LCD.fill_rect(pipe[0], 0, PIPE_WIDTH, pipe[1], LCD.green)
+            LCD.fill_rect(pipe[0], pipe[1] + GAP_SIZE, PIPE_WIDTH, 240 - pipe[1] - GAP_SIZE, LCD.green)
 
 
         LCD.show()

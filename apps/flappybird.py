@@ -22,7 +22,7 @@ def run():
     
     bird_v = 0
     bird_y = 120
-    GRAVITY = 0.5
+    GRAVITY = 0.6
     load_in()
     pipes = []
     PIPESPEED = 5
@@ -36,7 +36,7 @@ def run():
         frame_start = time.ticks_ms()
         # Input
         if keyA.value() == 0 or up.value() == 0:
-            bird_v = -8
+            bird_v = -6
 
             # Debounce
             while keyA.value() == 0 or up.value() == 0:
@@ -58,7 +58,7 @@ def run():
         
         if pipecounter < 1:
             pipes.append(makepipe())
-            pipecounter = 40
+            pipecounter = 20
         
         for pipe in pipes:
             movepipe(pipe, PIPESPEED)

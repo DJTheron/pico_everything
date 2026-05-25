@@ -6,14 +6,18 @@ from keys import up, keyA, keyY
 
 PIPE_WIDTH = 22
 GAP_SIZE = 65
+BIRD_X = 60
+BIRD_SIZE = 16
+
+_BIRD_DATA = b'\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\xa7 \xa7 \xa7 \xa7 \xa7 \xa7 \x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\xa7 \xa7 \x9f\xc7\x9f\xc7\xa7 \xff\xff\xff\xff\xff\xff\xa7 \x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\xa7 \x9f\xc7\x9f\xc7\xbfF\xa7 \xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xa7 \x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\xa7 \x9f\xc7\xbfF\xbfF\xbfF\xa7 \xf4\xdf\xff\xff\xff\xff\xff\xff \x08\xff\xff\xa7 \x1f\xf8\x1f\xf8\xa7 \xbfF\xbfF\xbfF\xbfF\xbfF\xa7 \xf4\xdf\xff\xff\xff\xff\xff\xff \x08\xff\xff\xa7 \x1f\xf8\x1f\xf8\xa7 \xa7 \xa7 \xa7 \xa7 \xbfF\xbfF\xa7 \xf4\xdf\xff\xff\xff\xff\xff\xff\xff\xff\xa7 \x1f\xf8\xa7 \xff\xff\xff\xff\xff\xff\xff\xff\xff\xff\xa7 \xbfF\xbfF\xa7 \xa7 \xa7 \xa7 \xa7 \xa7 \x1f\xf8\xa7 \x9f\xc7\xff\xff\xff\xff\xff\xff\x9f\xc7\xa7 \xbfF\xbfF\xa7 \x16)\x16)\x16)\x16)\x16)\xa7 \x1f\xf8\xa7 \xa7 \xa7 \xa7 \xa7 \x1f\x1d\x1f\x1d\xa7 \x16)\xa7 \xa7 \xa7 \xa7 \xa7 \x1f\xf8\x1f\xf8\x1f\xf8\xa7 \x1f\x1d\x1f\x1d\x1f\x1d\x1f\x1d\x1f\x1d\x1f\x1d\xa7 \x16)\x16)\x16)\x16)\xa7 \x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\xa7 \xa7 \x1f\x1d\x1f\x1d\x1f\x1d\x1f\x1d\x1f\x1d\xa7 \xa7 \xa7 \xa7 \x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\xa7 \xa7 \xa7 \xa7 \xa7 \x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8'
 
 def load_in():
     LCD.fill(LCD.blue)
     LCD.show()
 
 def makepipe():
-    # [x, gap_y] — gap_y is the top of the opening
-    return [240, random.randint(40, 150)]
+    # [x, gap_y, scored] — gap_y is the top of the opening
+    return [240, random.randint(40, 150), False]
 
 def movepipe(pipe, speed):
     pipe[0] -= speed
@@ -26,22 +30,20 @@ def run():
     load_in()
     pipes = []
     PIPESPEED = 5
+    flap_held = False
+    dead = False
+    score = 0
 
-    # bird sprite
-    with open("flappybird.bin", "rb") as f:
-        bird_buf = bytearray(f.read())
+    bird_buf = bytearray(_BIRD_DATA)
     bird_fb = framebuf.FrameBuffer(bird_buf, 16, 16, framebuf.RGB565)
 
     while True:
         frame_start = time.ticks_ms()
         # Input
-        if keyA.value() == 0 or up.value() == 0:
+        pressing = keyA.value() == 0 or up.value() == 0
+        if pressing and not flap_held:
             bird_v = -6
-
-            # Debounce
-            while keyA.value() == 0 or up.value() == 0:
-                pass
-            time.sleep(0.001)
+        flap_held = pressing
 
         if keyY.value() == 0:
             return
@@ -64,6 +66,31 @@ def run():
             movepipe(pipe, PIPESPEED)
         pipes = [p for p in pipes if p[0] > -PIPE_WIDTH]
 
+        # Score trigger — pipe fully passed the bird
+        for pipe in pipes:
+            if not pipe[2] and pipe[0] + PIPE_WIDTH < BIRD_X:
+                pipe[2] = True
+                score += 1
+
+        # Collision detection
+        bx1 = BIRD_X
+        bx2 = BIRD_X + BIRD_SIZE
+        by1 = int(bird_y)
+        by2 = int(bird_y) + BIRD_SIZE
+
+        if by1 < 0 or by2 > 240:
+            dead = True
+
+        for pipe in pipes:
+            px1 = pipe[0]
+            px2 = pipe[0] + PIPE_WIDTH
+            gap_top = pipe[1]
+            gap_bot = pipe[1] + GAP_SIZE
+            overlaps_x = bx1 < px2 and bx2 > px1
+            hits_top_pipe = by1 < gap_top
+            hits_bot_pipe = by2 > gap_bot
+            if overlaps_x and (hits_top_pipe or hits_bot_pipe):
+                dead = True
 
         # Drawing
         LCD.fill(LCD.blue)
@@ -75,9 +102,34 @@ def run():
             LCD.fill_rect(pipe[0], 0, PIPE_WIDTH, pipe[1], LCD.green)
             LCD.fill_rect(pipe[0], pipe[1] + GAP_SIZE, PIPE_WIDTH, 240 - pipe[1] - GAP_SIZE, LCD.green)
 
-
         LCD.show()
 
         elapsed = time.ticks_diff(time.ticks_ms(), frame_start)
         if elapsed < 50:
             time.sleep_ms(50 - elapsed)
+
+        if dead == True:
+            death_time = time.ticks_ms()
+            while True:
+                frame_start = time.ticks_ms()
+                LCD.fill(0x0000)
+                LCD.text(f"Score: {score}", 60, 40, LCD.green)
+                LCD.show()
+
+                if keyY.value() == 0:
+                    return
+
+                can_restart = time.ticks_diff(time.ticks_ms(), death_time) > 1000
+                if can_restart and keyA.value() == 0:
+                    bird_v = 0
+                    bird_y = 120
+                    load_in()
+                    pipes = []
+                    flap_held = False
+                    dead = False
+                    score = 0
+                    break
+
+                elapsed = time.ticks_diff(time.ticks_ms(), frame_start)
+                if elapsed < 50:
+                    time.sleep_ms(50 - elapsed)

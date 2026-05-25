@@ -9,7 +9,7 @@ breaktime = 5 * 60 * 1000
 
 def displaytime(s_passed, work):
     minutes = (s_passed % 3600000) // 60000
-    seconds = (s_passed % 60000) //§ 1000
+    seconds = (s_passed % 60000) // 1000
     timeleft = "%02d" % int(minutes) + ":" + "%02d" % int(seconds)
     LCD.fill(0x0000)
     if work:
@@ -25,20 +25,23 @@ def pomo():
     while True:
         while time.ticks_diff(time.ticks_ms(), start) < worktime and working == True:
             s_left = worktime - time.ticks_diff(time.ticks_ms(), start)
+            displaytime(s_left, working)
+            time.sleep(0.267)
+            
         if time.ticks_diff(time.ticks_ms(), start) >= worktime:
             working = False
             start = time.ticks_ms()
             
         while working == False:
             working = False
-            s_left = breaktime - time.ticks_diff(time.ticks_ms(), start - worktime)
+            s_left = breaktime - time.ticks_diff(time.ticks_ms(), start - breaktime)
             if time.ticks_diff(time.ticks_ms(), start - worktime) >= breaktime:
                 working = True
                 start = time.ticks_ms()
             if keyY.value() == 0:
                 return
-        displaytime(s_left, working)
-        time.sleep(0.267)
+            displaytime(s_left, working)
+            time.sleep(0.267)
         
 def load_in():
     LCD.fill(0x0000)

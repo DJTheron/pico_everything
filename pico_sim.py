@@ -22,11 +22,12 @@ W = H = 240
 # ── Colour conversion ──────────────────────────────────────────────────────────
 
 def _c(color):
-    """BGR565 (as stored in Pico framebuf) → pygame RGB tuple."""
-    r5 = (color >> 11) & 0x1F   # stored as R bits, shown as B on ST7789
-    g6 = (color >> 5)  & 0x3F
-    b5 =  color        & 0x1F   # stored as B bits, shown as R on ST7789
-    return (b5 << 3 | b5 >> 2, g6 << 2 | g6 >> 4, r5 << 3 | r5 >> 2)
+    """RGB565 as stored in Pico framebuf → pygame RGB tuple.
+    ST7789 with MAD=0x70: standard G bits→display R, B bits→display G, R bits→display B."""
+    r5 = (color >> 11) & 0x1F   # standard R bits → display Blue
+    g6 = (color >> 5)  & 0x3F   # standard G bits → display Red
+    b5 =  color        & 0x1F   # standard B bits → display Green
+    return (g6 << 2 | g6 >> 4, b5 << 3 | b5 >> 2, r5 << 3 | r5 >> 2)
 
 
 # ── framebuf mock (used by apps for sprites) ───────────────────────────────────
@@ -249,7 +250,12 @@ def main():
     sys.path.insert(0, os.path.dirname(__file__) or '.')
 
     app = __import__(app_name)
-    app.run()
+    if hasattr(app, 'run'):
+        app.run()
+    elif hasattr(app, 'main'):
+        app.main()
+    else:
+        raise AttributeError(f"{app_name}.py has no run() or main() function")
 
     pygame.quit()
 

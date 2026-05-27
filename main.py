@@ -10,7 +10,7 @@ sys.path.append('apps')
 def displaycard(title, path=''):
     path = '>' + 'apps/' + path
     LCD.fill(0x0000)
-    LCD.text(title, 60, 115, LCD.green, 2)
+    LCD.text(title.replace('.py', ''), 60, 115, LCD.green, 2)
     LCD.text(path, 2, 2, LCD.green)
     LCD.show()
 
@@ -51,7 +51,8 @@ def cards(cardsshow, selected):
             while keyA.value() == 0:
                 pass
             sleep(0.05)
-        if keyY.value() == 0:
+        if keyY.value() == 0 and os.getcwd() != '/apps':
+            while keyY.value() == 0: pass
             return
 
 def main():

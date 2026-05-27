@@ -5,7 +5,6 @@ import time
 from keys import up, keyA, keyY
 
 PIPE_WIDTH = 22
-GAP_SIZE = 65
 BIRD_X = 60
 BIRD_SIZE = 16
 SKY = 0xF49A
@@ -34,6 +33,8 @@ def run():
     flap_held = False
     dead = False
     score = 0
+    targetscore = 10
+    gap_size = GAP_SIZE
 
     bird_buf = bytearray(_BIRD_DATA)
     bird_fb = framebuf.FrameBuffer(bird_buf, 16, 16, framebuf.RGB565)
@@ -86,7 +87,7 @@ def run():
             px1 = pipe[0]
             px2 = pipe[0] + PIPE_WIDTH
             gap_top = pipe[1]
-            gap_bot = pipe[1] + GAP_SIZE
+            gap_bot = pipe[1] + gap_size
             overlaps_x = bx1 < px2 and bx2 > px1
             hits_top_pipe = by1 < gap_top
             hits_bot_pipe = by2 > gap_bot
@@ -101,13 +102,17 @@ def run():
 
         for pipe in pipes:
             LCD.fill_rect(pipe[0], 0, PIPE_WIDTH, pipe[1], LCD.green)
-            LCD.fill_rect(pipe[0], pipe[1] + GAP_SIZE, PIPE_WIDTH, 240 - pipe[1] - GAP_SIZE, LCD.green)
+            LCD.fill_rect(pipe[0], pipe[1] + gap_size, PIPE_WIDTH, 240 - pipe[1] - gap_size, LCD.green)
 
         LCD.show()
 
         elapsed = time.ticks_diff(time.ticks_ms(), frame_start)
         if elapsed < 50:
             time.sleep_ms(50 - elapsed)
+
+        if score > targetscore:
+            targetscore += 10
+            gap_size -= 10
 
         if dead == True:
             death_time = time.ticks_ms()
@@ -129,6 +134,8 @@ def run():
                     flap_held = False
                     dead = False
                     score = 0
+                    gap_size = GAP_SIZE
+                    targetscore = 10
                     break
 
                 elapsed = time.ticks_diff(time.ticks_ms(), frame_start)

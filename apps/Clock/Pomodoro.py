@@ -42,6 +42,9 @@ def pomo():
                 return
             displaytime(s_left, working)
             time.sleep(0.267)
+        if keyY.value() == 0:
+            while keyY.value() == 0: pass
+            return
         
 def load_in():
     LCD.fill(0x0000)
@@ -59,4 +62,5 @@ def run():
                 pass
             time.sleep(0.05)
         if keyY.value() == 0:
+            while keyY.value() == 0: pass
             return

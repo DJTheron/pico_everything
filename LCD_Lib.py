@@ -1,5 +1,5 @@
-from machine import Pin,SPI,PWM
-import framebuf
+from machine import Pin,SPI,PWM #type: ignore
+import framebuf2 as framebuf #import framebuf
 import time
 import os
 
@@ -150,6 +150,12 @@ class LCD_1inch3(framebuf.FrameBuffer):
         self.cs(0)
         self.spi.write(self.buffer)
         self.cs(1)
+
+    def text(self, s, x, y, color, size=1):
+        if size == 1:
+            super().text(s, x, y, color)
+        else:
+            self.large_text(s, x, y, size, color)
 
 LCD = LCD_1inch3()
 

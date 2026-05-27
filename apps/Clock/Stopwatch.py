@@ -31,6 +31,7 @@ def startstopwatch():
         displaytime(ms_passed)
         
         if keyY.value() == 0:
+            while keyY.value() == 0: pass
             return
         if keyA.value() == 0:
             if running == True:
@@ -56,4 +57,5 @@ def run():
                 pass
             time.sleep(0.05)
         if keyY.value() == 0:
+            while keyY.value() == 0: pass
             return

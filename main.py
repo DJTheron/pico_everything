@@ -14,7 +14,7 @@ def displaycard(title, path=''):
     LCD.text(path, 2, 2, LCD.green)
     LCD.show()
 
-def cards(cardsshow, selected):
+def cards(cardsshow, selected, basepath):
     displaycard(cardsshow[selected], cardsshow[selected])
     while True:
         if left.value() == 0:

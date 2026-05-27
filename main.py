@@ -11,7 +11,7 @@ def displaycard(title):
     LCD.fill(0x0000)
     if title.endswith('.py'):
         title = title.replace('.py', '')
-    LCD.text(title, 60, 115, LCD.green)
+    LCD.text(title, 60, 115, LCD.green, 2)
     LCD.show()
 
 def cards(cards, selected):
@@ -48,6 +48,7 @@ def main():
     LCD.fill(0x0000)
     LCD.show()
     apps = os.listdir('apps')
+    
     cards(apps, 0)
     
  

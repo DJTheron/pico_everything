@@ -1,6 +1,6 @@
 from LCD_Lib import LCD
 import time
-from keys import keyA, keyB, keyY#, keyX
+from keys import keyA, keyY
 
 ms_passed = 0
 
@@ -11,13 +11,13 @@ def displaytime(ms_passed):
     ms = ms_passed % 1000
     stopwatch = "%02d" % int(hours) + ":" + "%02d" % int(minutes) + ":" + "%02d" % int(seconds) + "." + "%03d" % int(ms)
     LCD.fill(0x0000)
-    LCD.text("Stopwatch", 40, 40, LCD.green, 2)
-    LCD.text(stopwatch, 20, 120, LCD.white, 2)
+    LCD.text("Stopwatch", 48, 40, LCD.green, 2)
+    LCD.text(stopwatch, 24, 112, LCD.white, 2)
     LCD.show()
 
 def load_in():
     LCD.fill(0x0000)
-    LCD.text("Stopwatch", 60, 40, LCD.green)
+    LCD.text("Stopwatch", 48, 40, LCD.green, 2)
     displaytime(0)
     LCD.show()
 

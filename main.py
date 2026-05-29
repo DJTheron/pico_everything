@@ -6,6 +6,7 @@ from keys import keyA, keyB, keyX, keyY, up, down, left, right, ctrl
 
 sys.path.append('apps')
 
+pressed = False
 
 def displaycard(title, path=''):
     path = '>' + 'apps/' + path
@@ -15,7 +16,8 @@ def displaycard(title, path=''):
     LCD.show()
 
 def cards(cardsshow, selected, basepath=''):
-    displaycard(cardsshow[selected], cardsshow[selected])
+    global pressed
+    displaycard(cardsshow[selected], basepath + cardsshow[selected])
     while True:
         if left.value() == 0:
             selected += 1
@@ -26,32 +28,35 @@ def cards(cardsshow, selected, basepath=''):
                 pass
             sleep(0.05)
         
-        
         if right.value() == 0:
             selected -= 1
             if selected < 0:
                 selected = len(cardsshow) - 1
-            displaycard(cardsshow[selected], cardsshow[selected])
-            while right.value() == 0:
-                pass
+            displaycard(cardsshow[selected], basepath + cardsshow[selected])
+            while right.value() == 0: pass
             sleep(0.05)
 
-        if keyA.value() == 0:
+        if keyA.value() == 0 and pressed == False:
+            pressed = True
             if cardsshow[selected].endswith('.py'):
                 apptoopen = __import__(cardsshow[selected].replace('.py', ''))
                 apptoopen.run()
+                
             elif (os.stat('apps/' + cardsshow[selected])[0] & 0x4000) == 16384:
                 os.chdir('apps/' + cardsshow[selected]) 
                 sys.path.append('apps/' + cardsshow[selected])
                 newapps = os.listdir()
-                cards(newapps, 0)
+                cards(newapps, 0, basepath + cardsshow[selected] + '/')
                 os.chdir('..')
                 
-            displaycard(cardsshow[selected], cardsshow[selected])
-            while keyA.value() == 0:
-                pass
+            displaycard(cardsshow[selected], basepath + cardsshow[selected])
+            while keyA.value() == 0: pass
             sleep(0.05)
-        if keyY.value() == 0 and os.getcwd() != '/apps':
+            
+        if keyA.value() == 1:
+            pressed = False
+
+        if keyY.value() == 0 and basepath != '':
             while keyY.value() == 0: pass
             return
 

@@ -120,7 +120,7 @@ def run():
             while True:
                 frame_start = time.ticks_ms()
                 LCD.fill(0x0000)
-                LCD.text(f"Score: {score}", 60, 40, LCD.green)
+                LCD.text(f"Score: {score}", 56, 112, 0xB965, 2)
                 LCD.show()
 
                 if keyY.value() == 0:

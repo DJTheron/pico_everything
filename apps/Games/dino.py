@@ -2,6 +2,7 @@ from LCD_Lib import LCD
 import framebuf
 import time
 from keys import up, keyA, keyY
+import random
 
 DINO_W    = 24
 DINO_H    = 24
@@ -21,15 +22,46 @@ FRAMES = 6
 SKY    = 0xBEAF
 GROUND = 0x75EF
 
+CACTUS_W = 4
+CACTUS_H = 16
+
+CACTUS_DATA = b'\x1f\xf8\x1b\xc7\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1f\xf8\x1b\xc7\x1f\xf8\x1f\xf8\x1f\xf8^\x06\x1f\xf8^\x06\x1f\xf8\x1b\xc7\x1f\xf8\x1f\xf8\x1b\xc7\x1f\xf8\x1b\xc7\x1b\xc7\x1f\xf8\x1f\xf8\x1f\xf8\x1b\xc7\x1b\xc7\x1f\xf8\x1b\xc7^\x06\x1b\xc7\x1f\xf8\x1f\xf8\x1b\xc7\x1b\xc7\x1f\xf8\x1f\xf8\x1b\xc7^\x06\x1b\xc7\x1f\xf8\x1b\xc7\x1b\xc7\x1f\xf8\x1f\xf8\x1b\xc7\x1b\xc7\x1f\xf8\x1b\xc7\x1b\xc7^\x06\x1f\xf8\x1f\xf8\x1b\xc7\x1b\xc7\x1b\xc7\x1f\xf8^\x06\x1b\xc7\x1f\xf8\x1f\xf8\x1b\xc7\x1b\xc7\x1f\xf8'
+
+def makecactus():
+    x = 240 - 5
+    y = 184
+
+    cactus = []
+    for _ in range(random.randint(1, 4)):
+        cactus.append([])
+
+
+    for i in range(len(cactus)):
+        cactus[i].append(x + i * 5)
+        cactus[i].append(y)
+
+    return cactus
+
+def movecactus(cactus):
+    for i in range(len(cactus)):
+        cactus[i][0] -= 5 # 5 = speed
+    return cactus
+    
+
 def run():
     frame_start = time.ticks_ms()
     dino_y   = float(GROUND_Y - DINO_H)
     dino_v   = 0.0
     frame    = 0
     tick     = 0
+    cactus_counter = 100
+
+    cacti = []
 
     bufs = [bytearray(f) for f in (_F0, _F1, _F2, _F3, _F4, _F5)]
     fbs  = [framebuf.FrameBuffer(b, DINO_W, DINO_H, framebuf.RGB565) for b in bufs]
+    cactus_buf = bytearray(CACTUS_DATA)
+    cactus_fb  = framebuf.FrameBuffer(cactus_buf, CACTUS_W, CACTUS_H, framebuf.RGB565)
 
     while True:
         frame_start = time.ticks_ms()
@@ -48,6 +80,19 @@ def run():
             dino_y = GROUND_Y - DINO_H
             dino_v = 0.0
 
+        cactus_counter -= 1
+
+        if cactus_counter < 1:
+            cacti.append(makecactus())
+            cactus_counter = random.randint(20,60)
+
+        # move cactuses
+        for i in range(len(cacti) - 1, -1, -1):
+            cacti[i] = movecactus(cacti[i])
+            if cacti[i][0][0] < -20:
+                cacti.pop(i)
+            
+
         # animation — only cycle when on the ground
         if on_ground:
             tick += 1
@@ -57,10 +102,16 @@ def run():
         else:
             frame = 0
 
+
         # drawing
         LCD.fill(SKY)
         LCD.fill_rect(0, GROUND_Y, 240, 240 - GROUND_Y, GROUND)
         LCD.blit(fbs[frame], DINO_X, int(dino_y), 0xF81F)
+
+        for i in range(len(cacti)):
+            for j in range(len(cacti[i])):
+                LCD.blit(cactus_fb, cacti[i][j][0], cacti[i][j][1], 0xF81F)
+
         LCD.show()
 
         elapsed = time.ticks_diff(time.ticks_ms(), frame_start)

@@ -6,7 +6,6 @@ from keys import keyA, keyB, keyX, keyY, up, down, left, right, ctrl
 
 sys.path.append('apps')
 
-pressed = False
 
 def displaycard(title, path=''):
     path = '>' + 'apps/' + path
@@ -16,7 +15,6 @@ def displaycard(title, path=''):
     LCD.show()
 
 def cards(cardsshow, selected, basepath=''):
-    global pressed
     displaycard(cardsshow[selected], basepath + cardsshow[selected])
     while True:
         if left.value() == 0:
@@ -35,8 +33,8 @@ def cards(cardsshow, selected, basepath=''):
             while right.value() == 0: pass
             sleep(0.05)
 
-        if keyA.value() == 0 and pressed == False:
-            pressed = True
+        if keyA.value() == 0:
+            while keyA.value() == 0: pass
             if cardsshow[selected].endswith('.py'):
                 apptoopen = __import__(cardsshow[selected].replace('.py', ''))
                 apptoopen.run()
@@ -49,11 +47,6 @@ def cards(cardsshow, selected, basepath=''):
                 os.chdir('..')
                 
             displaycard(cardsshow[selected], basepath + cardsshow[selected])
-            while keyA.value() == 0: pass
-            sleep(0.05)
-            
-        if keyA.value() == 1:
-            pressed = False
 
         if keyY.value() == 0 and basepath != '':
             while keyY.value() == 0: pass

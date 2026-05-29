@@ -23,9 +23,8 @@ def cards(cardsshow, selected, basepath=''):
             selected += 1
             if selected >= len(cardsshow):
                 selected = 0
-            displaycard(cardsshow[selected], cardsshow[selected])
-            while left.value() == 0:
-                pass
+            displaycard(cardsshow[selected], basepath + cardsshow[selected])
+            while left.value() == 0: pass
             sleep(0.05)
         
         if right.value() == 0:

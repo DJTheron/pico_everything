@@ -42,10 +42,24 @@ def makecactus():
 
     return cactus
 
-def movecactus(cactus):
+def movecactus(cactus, speed):
     for i in range(len(cactus)):
-        cactus[i][0] -= 5 # 5 = speed
+        cactus[i][0] -= speed
     return cactus
+
+def check_collision(dino_y, cacti):
+    margin = 3
+    dx1 = DINO_X + margin
+    dy1 = int(dino_y) + margin
+    dx2 = DINO_X + DINO_W - margin
+    dy2 = int(dino_y) + DINO_H - margin
+    for group in cacti:
+        for cactus in group:
+            cx2 = cactus[0] + CACTUS_W
+            cy2 = cactus[1] + CACTUS_H
+            if dx1 < cx2 and dx2 > cactus[0] and dy1 < cy2 and dy2 > cactus[1]:
+                return True
+    return False
     
 
 def run():
@@ -54,7 +68,11 @@ def run():
     dino_v   = 0.0
     frame    = 0
     tick     = 0
-    cactus_counter = 100
+    cactus_counter = 40
+    score = 0
+    targetscore = 300
+    speed = 5
+    dead = False
 
     cacti = []
 
@@ -84,14 +102,22 @@ def run():
 
         if cactus_counter < 1:
             cacti.append(makecactus())
-            cactus_counter = random.randint(20,60)
+            cactus_counter = random.randint(20,50)
 
         # move cactuses
         for i in range(len(cacti) - 1, -1, -1):
-            cacti[i] = movecactus(cacti[i])
+            cacti[i] = movecactus(cacti[i], speed)
             if cacti[i][0][0] < -20:
                 cacti.pop(i)
-            
+
+        if check_collision(dino_y, cacti):
+            dead = True
+
+        score += 1
+
+        if score > targetscore:
+            targetscore += 300
+            speed += 1
 
         # animation — only cycle when on the ground
         if on_ground:
@@ -117,3 +143,34 @@ def run():
         elapsed = time.ticks_diff(time.ticks_ms(), frame_start)
         if elapsed < 50:
             time.sleep_ms(50 - elapsed)
+
+        if dead:
+            death_time = time.ticks_ms()
+            while True:
+                frame_start = time.ticks_ms()
+                LCD.fill(0x0000)
+                LCD.text(f"Score: {score}", 56, 112, 0xB965, 2)
+                LCD.show()
+
+                if keyY.value() == 0:
+                    return
+
+                can_restart = time.ticks_diff(time.ticks_ms(), death_time) > 1000
+                if can_restart and keyA.value() == 0:
+                    frame_start = time.ticks_ms()
+                    dino_y   = float(GROUND_Y - DINO_H)
+                    dino_v   = 0.0
+                    frame    = 0
+                    tick     = 0
+                    cactus_counter = 40
+                    score = 0
+                    targetscore = 500
+                    speed = 5
+
+                    cacti = []
+                    dead = False
+                    break
+
+                elapsed = time.ticks_diff(time.ticks_ms(), frame_start)
+                if elapsed < 50:
+                    time.sleep_ms(50 - elapsed)

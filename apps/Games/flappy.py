@@ -136,6 +136,7 @@ def run():
                     dead = False
                     score = 0
                     targetscore = 10
+                    PIPESPEED = 5
                     break
 
                 elapsed = time.ticks_diff(time.ticks_ms(), frame_start)

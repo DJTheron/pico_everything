@@ -13,10 +13,10 @@ def displaytime(s_passed, work):
     timeleft = "%02d" % int(minutes) + ":" + "%02d" % int(seconds)
     LCD.fill(0x0000)
     if work:
-        LCD.text("Work Time", 60, 40, LCD.green)
+        LCD.text("Work Time", 60, 40, LCD.green, 2)
     else:
-        LCD.text("Break Time", 60, 40, LCD.blue)
-    LCD.text(timeleft, 80, 120, LCD.white)
+        LCD.text("Break Time", 60, 40, LCD.blue, 2)
+    LCD.text(timeleft, 80, 120, LCD.white, 2)
     LCD.show()
     
 def pomo():
@@ -27,6 +27,9 @@ def pomo():
             s_left = worktime - time.ticks_diff(time.ticks_ms(), start)
             displaytime(s_left, working)
             time.sleep(0.267)
+            if keyY.value() == 0:
+                while keyY.value() == 0: pass
+                return
             
         if time.ticks_diff(time.ticks_ms(), start) >= worktime:
             working = False
@@ -39,6 +42,7 @@ def pomo():
                 working = True
                 start = time.ticks_ms()
             if keyY.value() == 0:
+                while keyY.value() == 0: pass
                 return
             displaytime(s_left, working)
             time.sleep(0.267)
@@ -48,7 +52,7 @@ def pomo():
         
 def load_in():
     LCD.fill(0x0000)
-    LCD.text("Pomodoro", 60, 40, LCD.green)
+    LCD.text("Pomodoro", 60, 40, LCD.green, 2)
     displaytime(worktime, True)
     LCD.show()
     

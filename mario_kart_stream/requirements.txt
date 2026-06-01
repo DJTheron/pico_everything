@@ -1,2 +1,0 @@
-mgba
-numpy

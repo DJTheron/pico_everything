@@ -3,7 +3,15 @@ import framebuf
 import random
 import time
 from keys import up, keyA, keyY
+import json
+import os
 
+highscore_file = "/apps/games/game_highscores.json"
+if os.path.exists(highscore_file):
+    with open(highscore_file, "r") as f:
+        highscore_data = json.load(f)
+    highscore = highscore_data[__file__]
+    
 PIPE_WIDTH = 22
 BIRD_X = 60
 BIRD_SIZE = 16
@@ -121,13 +129,15 @@ def run():
                 frame_start = time.ticks_ms()
                 LCD.fill(0x0000)
                 LCD.text(f"Score: {score}", 56, 112, 0xB965, 2)
+                if score > highscore:
+                    highscore_data[__file__] = score
                 LCD.show()
 
                 if keyY.value() == 0:
                     return
 
                 can_restart = time.ticks_diff(time.ticks_ms(), death_time) > 1000
-                if can_restart and keyA.value() == 0:
+                if can_restart and (keyA.value() == 0 or up.value() == 0):
                     bird_v = 0
                     bird_y = 120
                     load_in()

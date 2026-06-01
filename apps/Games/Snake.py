@@ -1,4 +1,5 @@
 from LCD_Lib import LCD
+import framebuf
 import time
 from keys import up, down, left, right, keyY
 
@@ -10,7 +11,9 @@ _SNAKELONG = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\
 _SNAKECORNER = b'\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xcf8\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xcf8\xb4(\xb4(\x00\x00\x00\x00\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 _SNAKETAIL = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xcf8\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\xb4(\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
 
-SKY = 3232a8 # claude make it the correct color, it in hex
+SKY = 0xA986
+
+lastdir = []
 
 def rotate_90(tile):
     N = SPRITE_SIZE
@@ -21,14 +24,19 @@ def rotate_90(tile):
             dst = (row * N + col) * 2
             result[dst]     = tile[src]
             result[dst + 1] = tile[src + 1]
-    return bytes(result)
+    return result
 
 def _make_rotations(base):
-    r0 = base
+    r0 = bytearray(base)
     r1 = rotate_90(r0)
     r2 = rotate_90(r1)
     r3 = rotate_90(r2)
-    return (r0, r1, r2, r3)
+    return (
+        framebuf.FrameBuffer(r0, SPRITE_SIZE, SPRITE_SIZE, framebuf.RGB565),
+        framebuf.FrameBuffer(r1, SPRITE_SIZE, SPRITE_SIZE, framebuf.RGB565),
+        framebuf.FrameBuffer(r2, SPRITE_SIZE, SPRITE_SIZE, framebuf.RGB565),
+        framebuf.FrameBuffer(r3, SPRITE_SIZE, SPRITE_SIZE, framebuf.RGB565),
+    )
 
 TILES = {
     'head':   _make_rotations(_SNAKEHEAD),
@@ -38,6 +46,7 @@ TILES = {
 }
 
 def movesnake(direction, snake):
+    global lastdir
 
     if direction == [0,-1]: # up
         reldir = 3
@@ -50,16 +59,19 @@ def movesnake(direction, snake):
 
     snake.pop()
     snake.insert(0, [snake[0][0] + direction[0], snake[0][1] + direction[1], TILES['head'][reldir]])
+    snake[-1][2] = TILES['tail'][reldir]
+    if lastdir == direction:
+        snake[1][2] = TILES['body'][reldir]
 
     if lastdir != direction:
-        if   lastdir == [1,0]  and direction == [0,1]:  snake[0][2] = TILES['corner'][0]
-        elif lastdir == [0,1]  and direction == [1,0]:  snake[0][2] = TILES['corner'][0]
-        elif lastdir == [0,1]  and direction == [-1,0]: snake[0][2] = TILES['corner'][1]
-        elif lastdir == [-1,0] and direction == [0,1]:  snake[0][2] = TILES['corner'][1]
-        elif lastdir == [-1,0] and direction == [0,-1]: snake[0][2] = TILES['corner'][2]
-        elif lastdir == [0,-1] and direction == [-1,0]: snake[0][2] = TILES['corner'][2]
-        elif lastdir == [0,-1] and direction == [1,0]:  snake[0][2] = TILES['corner'][3]
-        elif lastdir == [1,0]  and direction == [0,-1]: snake[0][2] = TILES['corner'][3]
+        if   lastdir == [1,0]  and direction == [0,1]:  snake[1][2] = TILES['corner'][1]
+        elif lastdir == [0,1]  and direction == [1,0]:  snake[1][2] = TILES['corner'][1]
+        elif lastdir == [0,1]  and direction == [-1,0]: snake[1][2] = TILES['corner'][2]
+        elif lastdir == [-1,0] and direction == [0,1]:  snake[1][2] = TILES['corner'][2]
+        elif lastdir == [-1,0] and direction == [0,-1]: snake[1][2] = TILES['corner'][3]
+        elif lastdir == [0,-1] and direction == [-1,0]: snake[1][2] = TILES['corner'][3]
+        elif lastdir == [0,-1] and direction == [1,0]:  snake[1][2] = TILES['corner'][0]
+        elif lastdir == [1,0]  and direction == [0,-1]: snake[1][2] = TILES['corner'][0]
 
     lastdir = direction
     return snake
@@ -67,6 +79,7 @@ def movesnake(direction, snake):
 def run():
     snake = [[2,7, TILES['head'][0]],[1,7, TILES['body'][0]],[0,7, TILES['tail'][0]]]
     dir = [1,0]
+    framecounter = 0
 
 
     while True:
@@ -85,16 +98,18 @@ def run():
             return
 
         # fysics
-
+        framecounter += 1
         # move snake
-        snake = movesnake(dir, snake)
+        if framecounter > 10:
+            snake = movesnake(dir, snake)
+            framecounter = 0
 
         # drawing
 
         LCD.fill(SKY)
 
         for i in range(len(snake)):
-            LCD.blit(snake[i][2], snake[i][0], snake[i][1], 0xF81F)
+            LCD.blit(snake[i][2], snake[i][0] * 15, snake[i][1] * 15, 0x0000)
 
         LCD.show()
 

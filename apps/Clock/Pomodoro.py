@@ -20,7 +20,7 @@ def displaytime(s_passed, work):
     LCD.show()
     
 def pomo():
-    start = time.ticks_ms()
+    start = time.ticks_ms() #type: ignore
     working = True
     while True:
         while time.ticks_diff(time.ticks_ms(), start) < worktime and working == True:
@@ -37,15 +37,19 @@ def pomo():
             
         while working == False:
             working = False
-            s_left = breaktime - time.ticks_diff(time.ticks_ms(), start - breaktime)
+            s_left = time.ticks_diff(breaktime, time.ticks_diff(time.ticks_ms(), start))
+            
             if time.ticks_diff(time.ticks_ms(), start - worktime) >= breaktime:
                 working = True
                 start = time.ticks_ms()
+                
             if keyY.value() == 0:
                 while keyY.value() == 0: pass
                 return
+            
             displaytime(s_left, working)
             time.sleep(0.267)
+            
         if keyY.value() == 0:
             while keyY.value() == 0: pass
             return
@@ -62,8 +66,7 @@ def run():
         if keyA.value() == 0:
             pomo()
             displaytime(worktime, True)
-            while keyA.value() == 0:
-                pass
+            while keyA.value() == 0: pass
             time.sleep(0.05)
         if keyY.value() == 0:
             while keyY.value() == 0: pass

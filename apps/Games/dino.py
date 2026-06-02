@@ -3,6 +3,14 @@ import framebuf
 import time
 from keys import up, keyA, keyY
 import random
+import os
+import json
+
+highscore_file = "/apps/games/game_highscores.json"
+if os.path.exists(highscore_file):
+    with open(highscore_file, "r") as f:
+        highscore_data = json.load(f)
+    highscore = highscore_data[__file__]
 
 DINO_W    = 24
 DINO_H    = 24
@@ -150,6 +158,13 @@ def run():
                 frame_start = time.ticks_ms()
                 LCD.fill(0x0000)
                 LCD.text(f"Score: {score}", 56, 112, 0xB965, 2)
+                if score > highscore:
+                    highscore_data[__file__] = score
+                    with open(highscore_file, "w") as f:
+                        json.dump(highscore_data, f)
+                    LCD.text(f"New Highscore: {highscore}", 56, 130, 0xB965, 2)
+                else:
+                    LCD.text(f"Highscore: {highscore}", 56, 130, 0xB965, 2)
                 LCD.show()
 
                 if keyY.value() == 0:

@@ -6,7 +6,7 @@ import random
 import os
 import json
 
-highscore_file = "/apps/games/game_highscores.json"
+highscore_file = "/apps/Games/game_highscores.json"
 if os.path.exists(highscore_file):
     with open(highscore_file, "r") as f:
         highscore_data = json.load(f)

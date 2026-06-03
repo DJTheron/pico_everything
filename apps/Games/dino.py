@@ -71,6 +71,7 @@ def check_collision(dino_y, cacti):
     
 
 def run():
+    global highscore, highscore_data
     frame_start = time.ticks_ms()
     dino_y   = float(GROUND_Y - DINO_H)
     dino_v   = 0.0

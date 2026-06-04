@@ -64,14 +64,14 @@ def movesnake(direction, snake):
         snake[1][2] = TILES['body'][reldir]
 
     if lastdir != direction:
-        if   lastdir == [1,0]  and direction == [0,1]:  snake[1][2] = TILES['corner'][1]
-        elif lastdir == [0,1]  and direction == [1,0]:  snake[1][2] = TILES['corner'][1]
-        elif lastdir == [0,1]  and direction == [-1,0]: snake[1][2] = TILES['corner'][2]
-        elif lastdir == [-1,0] and direction == [0,1]:  snake[1][2] = TILES['corner'][2]
-        elif lastdir == [-1,0] and direction == [0,-1]: snake[1][2] = TILES['corner'][3]
-        elif lastdir == [0,-1] and direction == [-1,0]: snake[1][2] = TILES['corner'][3]
-        elif lastdir == [0,-1] and direction == [1,0]:  snake[1][2] = TILES['corner'][0]
-        elif lastdir == [1,0]  and direction == [0,-1]: snake[1][2] = TILES['corner'][0]
+        if   lastdir == [1,0]  and direction == [0,1]:  snake[1][2] = TILES['corner'][3]
+        elif lastdir == [0,1]  and direction == [1,0]:  snake[1][2] = TILES['corner'][3]
+        elif lastdir == [0,1]  and direction == [-1,0]: snake[1][2] = TILES['corner'][0]
+        elif lastdir == [-1,0] and direction == [0,1]:  snake[1][2] = TILES['corner'][0]
+        elif lastdir == [-1,0] and direction == [0,-1]: snake[1][2] = TILES['corner'][1]
+        elif lastdir == [0,-1] and direction == [-1,0]: snake[1][2] = TILES['corner'][1]
+        elif lastdir == [0,-1] and direction == [1,0]:  snake[1][2] = TILES['corner'][2]
+        elif lastdir == [1,0]  and direction == [0,-1]: snake[1][2] = TILES['corner'][2]
 
     lastdir = direction
     return snake

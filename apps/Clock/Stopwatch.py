@@ -51,7 +51,7 @@ def run():
     global hours, minutes, seconds, stopwatch
     while True:
         if keyA.value() == 0:
-            while keyA.value() == 0: pass
+            while keyA.value() == 0: pass 
             startstopwatch()
             displaytime(0)
             while keyA.value() == 0:

@@ -39,9 +39,9 @@ def cards(cardsshow, selected, basepath=''):
                 apptoopen = __import__(cardsshow[selected].replace('.py', ''))
                 apptoopen.run()
                 
-            elif (os.stat('apps/' + cardsshow[selected])[0] & 0x4000) == 16384:
-                os.chdir('apps/' + cardsshow[selected]) 
-                sys.path.append('apps/' + cardsshow[selected])
+            elif (os.stat(cardsshow[selected])[0] & 0x4000) == 16384:
+                os.chdir(cardsshow[selected]) 
+                sys.path.append(cardsshow[selected])
                 newapps = os.listdir()
                 cards(newapps, 0, basepath + cardsshow[selected] + '/')
                 os.chdir('..')
@@ -55,7 +55,9 @@ def cards(cardsshow, selected, basepath=''):
 def main():
     LCD.fill(0x0000)
     LCD.show()
-    apps = os.listdir('apps')
+    os.chdir('apps')
+    apps = os.listdir()
+    
     
     cards(apps, 0)
     

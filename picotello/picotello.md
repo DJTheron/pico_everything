@@ -1,0 +1,12 @@
+#  DJI Tello drone to controller interconnect using pico
+ - it will be an app for the pico everything: Pico-tello App
+ - controller -> pico -> tello
+ - possible no-controller direct pico -> tello 
+ - optional video stream to pico display
+ - controller via bluetooth, controller pairing list
+ - tello wifi pairing list
+ - normal camera filming mode controls
+ - fpv mode, eg fpv sticks so if throttle not like up then drone will fly down, simulates fpv drone
+ - take photos and videos + view them with the photos app + improve photos app
+  - limited amount to not take up lots of storage
+  - low latency controls?
